@@ -52,7 +52,20 @@ def movies():
     else:
         errors = form_errors(form)
         return jsonify({"errors": errors}), 400
-
+    
+@app.route('/api/v1/movies', methods=['GET'])
+def get_movies():
+    all_movies = Movie.query.all()
+    movies_list = []
+    for movie in all_movies:
+        movies_list.append({
+            'id': movie.id,
+            'title': movie.title,
+            'description': movie.description,
+            'poster': '/api/v1/posters/' + movie.poster
+        })
+    return jsonify({'movies': movies_list})
+    
 def form_errors(form):
     error_messages = []
     """Collects form errors"""
@@ -85,19 +98,6 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return jsonify(error="Page not found"), 404
-
-@app.route('/api/v1/movies', methods=['GET'])
-def get_movies():
-    movies = Movie.query.all()
-    movies_list = []
-    for movie in movies:
-        movies_list.append({
-            'id': movie.id,
-            'title': movie.title,
-            'description': movie.description,
-            'poster': '/api/v1/posters/' + movie.poster
-        })
-    return jsonify({'movies': movies_list})
 
 @app.route('/api/v1/posters/<filename>', methods=['GET'])
 def get_poster(filename):
